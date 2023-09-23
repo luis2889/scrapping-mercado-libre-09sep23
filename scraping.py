@@ -1,17 +1,19 @@
-from selenium import webdriver
+import requests
 from bs4 import BeautifulSoup
 import pandas as pd
 
-#"C:\\Windows\\chromedriver_win32\\chromedriver.exe"
-
-driver = webdriver.Chrome()
+url = "https://www.flipkart.com/laptops/~buyback-guarantee-on-laptops-/pr?sid=6bo%2Cb5g&uniqBStoreParam1=val1&wid=11.productCard.PMU_V2"
 
 products=[]
 prices=[]
 ratings=[]
-driver.get("https://www.flipkart.com/laptops/~buyback-guarantee-on-laptops-/pr?sid=6bo%2Cb5g&uniqBStoreParam1=val1&wid=11.productCard.PMU_V2")
+response = requests.get(url)
 
-content = driver.page_source
+#pip install selenium
+#pip install pandas
+#pip3 install beautifulsoup4
+
+content = response.text
 soup = BeautifulSoup(content, features="html.parser")
 for a in soup.findAll('a',href=True, attrs={'class':'_1fQZEK'}):
     name=a.find('div', attrs={'class':'_4rR01T'})
@@ -20,5 +22,6 @@ for a in soup.findAll('a',href=True, attrs={'class':'_1fQZEK'}):
     products.append(name.text)
     prices.append(price.text)
     ratings.append(rating.text)
+
 df = pd.DataFrame({'Product Name':products,'Price':prices,'Rating':ratings}) 
-df.to_csv('products.csv', index=False, encoding='utf-8')
+df.to_json('products.json')
